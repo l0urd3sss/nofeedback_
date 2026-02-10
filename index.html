@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Lectura de marca — Lourdes</title>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+  <div id="star-rain"></div>
+  <!-- Top bar -->
+  <header class="topbar">
+    <div class="brand">★</div>
+    <nav class="nav">
+      <a href="#lectura">lectura de marca</a>
+      <a href="#contacto">contacto</a>
+    </nav>
+  </header>
+
+  <main>
+
+    <!-- SECCIÓN 1 — HERO -->
+    <section class="hero hero--image" id="hero">
+    <div class="hero-content">
+      <h1>
+        diseño marcas de todo tipo,<br>
+        pero sobre todo ayudo a decidir<br>
+        qué decir y cómo sostenerlo en el tiempo.
+      </h1>
+
+      <button class="btn btn--primary" id="btnStartHero">
+        lectura de marca
+      </button>
+      </div>
+    </section>
+
+    <!-- SECCIÓN 2 — PROBLEMA -->
+    <section class="problem">
+      <p class="lead">
+        a la mayoría de las marcas no les falta hacer más cosas.<br>
+        les falta dirección.
+      </p>
+
+    <ul class="bullets">
+        <li>dudan de cada decisión</li>
+        <li>todo se siente suelto</li>
+        <li>no saben qué hacer con su marca en el día a día</li>
+    </ul>
+
+
+
+      <p class="center">
+        esta lectura sirve para entender<br>
+        si tu problema es identidad, dirección o ejecución.
+      </p>
+
+      <div style="text-align:center">
+        <button class="btn btn--primary" id="btnStartProblem">
+          empezar la lectura
+        </button>
+      </div>
+    </section>
+
+    <!-- SECCIÓN 3 — LECTURA DE MARCA (DIAGNÓSTICO) -->
+    <section class="quiz" id="lectura">
+
+      <div class="quiz-card">
+
+        <div class="quiz-top">
+          <button class="back" id="btnBack" aria-label="volver">‹</button>
+          <div class="progress" id="progressText">1/5</div>
+          <div class="back-spacer"></div>
+        </div>
+
+        <h2 class="question">
+          ¿en qué estado sentís que está tu marca hoy?
+        </h2>
+
+        <div class="options" id="options">
+          <!-- opciones dinámicas por JS -->
+        </div>
+
+      </div>
+    </section>
+
+    <!-- RESULTADO -->
+    <section class="result" id="result" hidden>
+      <div class="result-card">
+        <div class="result-kicker">
+          lectura de marca realizada
+        </div>
+
+        <h2 class="result-title" id="resultTitle"></h2>
+
+        <p class="result-text" id="resultText"></p>
+
+        <div class="result-actions">
+          <a href="#contacto" class="btn btn--primary">
+            hablemos
+          </a>
+          <button class="result-link" id="btnRestart">
+            hacer otra lectura
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- CONTACTO -->
+  <section class="contact" id="contacto">
+  <h3>
+    ejecutar sin dirección<br />
+    también es un problema
+  </h3>
+
+  <p>
+    a veces hay que parar,<br />
+    mirar lo que hay y decidir mejor
+  </p>
+
+  <form
+    class="contact-form"
+    name="contacto"
+    method="POST"
+    data-netlify="true"
+  >
+    <input type="hidden" name="form-name" value="contacto" />
+
+    <input
+      type="hidden"
+      name="resultado_diagnostico"
+      id="leadResult"
+      value=""
+    />
+
+    <input
+      type="email"
+      name="email"
+      placeholder="tu mail"
+      required
+    />
+
+    <button
+      class="btn btn--primary"
+      type="submit"
+      id="btnSubmit"
+    >
+      hablemos
+    </button>
+  </form>
+
+  <p class="small">
+    coordinemos una charla para pensar la dirección de tu marca
+  </p>
+</section>
+
+
+    <footer class="mini-footer mini-footer--yellow">
+  <a href="#hero" class="footer-left footer-star" aria-label="volver al inicio">
+  ★
+  </a>
+
+  <div class="footer-center">
+    <a class="social" href="https://instagram.com/TU_USUARIO" target="_blank" rel="noopener" aria-label="Instagram"></a>
+    <a class="social" href="https://linkedin.com/in/TU_USUARIO" target="_blank" rel="noopener" aria-label="LinkedIn"></a>
+    <a class="social" href="mailto:TUMAIL@DOMINIO.COM" aria-label="Email"></a>
+  </div>
+
+  <div class="footer-right">
+    <a href="#lectura" class="footer-cta">lectura de marca</a>
+  </div>
+</footer>
+
+
+  </main>
+
+  <!-- JS -->
+  <script src="script.js"></script>
+
+</body>
+</html>
