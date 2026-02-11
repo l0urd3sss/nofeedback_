@@ -1,4 +1,11 @@
+// ==============================
+// Estado global
+// ==============================
+let lastDiagnosis = ""; // guarda el último resultado del quiz (para el form)
+
+// ==============================
 // ⭐ Star rain (trigger manual)
+// ==============================
 function createStarBurst(count = 16) {
   const starContainer = document.getElementById("star-rain");
   if (!starContainer) return;
@@ -27,9 +34,9 @@ function starRain() {
   setTimeout(() => createStarBurst(8), 240);
 }
 
-// ------------------------------
+// ==============================
 // Lectura de marca (wizard)
-// ------------------------------
+// ==============================
 const questions = [
   {
     id: "q1",
@@ -107,7 +114,9 @@ const RESULTS = {
   },
 };
 
-// DOM
+// ==============================
+// DOM refs
+// ==============================
 const optionsEl = document.getElementById("options");
 const questionEl = document.querySelector(".question");
 const progressEl = document.getElementById("progressText");
@@ -122,24 +131,40 @@ const btnStartHero = document.getElementById("btnStartHero");
 const btnStartProblem = document.getElementById("btnStartProblem");
 const btnRestart = document.getElementById("btnRestart");
 
-if (!optionsEl) {
-  console.error("No encuentro el div #options. Revisa que exista: <div id='options'></div>");
-}
+// Form
+const contactForm = document.querySelector("form[name='contacto']");
+const submitBtn = document.getElementById("btnSubmit");
 
+// ==============================
 // State
+// ==============================
 let currentIndex = 0;
 let answers = new Array(questions.length).fill(null);
 
+// ==============================
+// Helpers
+// ==============================
 function scrollToQuiz() {
   if (!quizSection) return;
   quizSection.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
+function clearLeadField() {
+  const leadField = document.getElementById("leadResult");
+  if (leadField) leadField.value = "";
+}
+
 function resetAll() {
   currentIndex = 0;
   answers = new Array(questions.length).fill(null);
+
+  // limpiar diagnóstico guardado
+  lastDiagnosis = "";
+  clearLeadField();
+
   if (resultSection) resultSection.hidden = true;
   if (quizSection) quizSection.hidden = false;
+
   renderQuestion();
 }
 
@@ -149,11 +174,7 @@ function renderQuestion() {
   const q = questions[currentIndex];
 
   if (progressEl) progressEl.textContent = `${currentIndex + 1}/${questions.length}`;
-
-  if (btnBack) {
-    btnBack.style.visibility = currentIndex === 0 ? "hidden" : "visible";
-  }
-
+  if (btnBack) btnBack.style.visibility = currentIndex === 0 ? "hidden" : "visible";
   if (questionEl) questionEl.textContent = q.text;
 
   optionsEl.innerHTML = "";
@@ -165,13 +186,13 @@ function renderQuestion() {
     btn.textContent = opt.label;
 
     btn.addEventListener("click", () => {
-      // feedback seleccionado (rápido)
-      document.querySelectorAll(".option").forEach(el => el.classList.remove("is-selected"));
+      // feedback seleccionado
+      document.querySelectorAll(".option").forEach((el) => el.classList.remove("is-selected"));
       btn.classList.add("is-selected");
 
       answers[currentIndex] = idx;
 
-      // autopaso (con mini delay para que se note el click)
+      // autopaso con mini delay
       setTimeout(() => {
         if (currentIndex < questions.length - 1) {
           currentIndex += 1;
@@ -198,27 +219,31 @@ function showResult() {
     totals.ajuste += s.ajuste || 0;
   });
 
-    const winner =
+  const winner =
     Object.entries(totals).sort((a, b) => b[1] - a[1])[0]?.[0] || "claridad";
 
-    const r = RESULTS[winner];
+  const r = RESULTS[winner];
 
-const leadField = document.getElementById("leadResult");
-if (leadField && !leadField.value) {
-  leadField.value = "contacto sin lectura de marca";
-}
+  // ✅ guardar diagnóstico para el form (Netlify)
+  lastDiagnosis = `${r.title} — ${r.text}`;
 
+  const leadField = document.getElementById("leadResult");
+  if (leadField) leadField.value = lastDiagnosis;
 
   // pintar resultado en pantalla
-  resultTitleEl.textContent = r.title;
-  resultTextEl.textContent = r.text;
+  if (resultTitleEl) resultTitleEl.textContent = r.title;
+  if (resultTextEl) resultTextEl.textContent = r.text;
 
-  quizSection.hidden = true;
-  resultSection.hidden = false;
-  resultSection.scrollIntoView({ behavior: "smooth", block: "start" });
+  if (quizSection) quizSection.hidden = true;
+  if (resultSection) {
+    resultSection.hidden = false;
+    resultSection.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
 }
 
+// ==============================
 // Events
+// ==============================
 if (btnBack) {
   btnBack.addEventListener("click", () => {
     if (currentIndex === 0) return;
@@ -250,21 +275,29 @@ if (btnRestart) {
   });
 }
 
-// Init
-document.addEventListener("DOMContentLoaded", () => {
-  renderQuestion();
-});
-const leadField = document.getElementById("leadResult");
-if (leadField) {
-  leadField.value = `${r.title} — ${r.text}`;
-}
-const contactForm = document.querySelector("form[name='contacto']");
-const submitBtn = document.getElementById("btnSubmit");
-
+// ✅ Form submit: asegurar resultado + UX "gracias"
 if (contactForm && submitBtn) {
   contactForm.addEventListener("submit", () => {
+    const leadField = document.getElementById("leadResult");
+
+    // si no hay diagnóstico guardado, igual mandamos algo
+    if (leadField && !leadField.value) {
+      leadField.value = lastDiagnosis || "contacto sin lectura de marca";
+    }
+
     submitBtn.textContent = "gracias";
     submitBtn.disabled = true;
     submitBtn.style.opacity = "0.7";
   });
 }
+
+// ==============================
+// Init
+// ==============================
+document.addEventListener("DOMContentLoaded", () => {
+  // primera render
+  renderQuestion();
+
+  // si el botón back existe, en la primera pantalla no se ve
+  if (btnBack) btnBack.style.visibility = "hidden";
+});
