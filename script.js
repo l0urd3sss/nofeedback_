@@ -3,6 +3,8 @@
 // ==============================
 let lastDiagnosis = ""; // guarda el último resultado del quiz (para el form)
 
+const DIAG_KEY = "lastDiagnosis"; // localStorage key
+
 // ==============================
 // ⭐ Star rain (trigger manual)
 // ==============================
@@ -131,8 +133,11 @@ const btnStartHero = document.getElementById("btnStartHero");
 const btnStartProblem = document.getElementById("btnStartProblem");
 const btnRestart = document.getElementById("btnRestart");
 
+// link "hablemos" dentro del RESULTADO (para reforzar el hidden antes de saltar)
+const resultTalkLink = document.querySelector('#result a[href="#contacto"]');
+
 // Form
-const contactForm = document.querySelector("form[name='contacto']");
+const contactForm = document.querySelector('form[name="contacto"]');
 const submitBtn = document.getElementById("btnSubmit");
 
 // ==============================
@@ -149,18 +154,35 @@ function scrollToQuiz() {
   quizSection.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
-function clearLeadField() {
-  const leadField = document.getElementById("leadResult");
-  if (leadField) leadField.value = "";
+function getLeadField() {
+  return document.getElementById("leadResult");
+}
+
+function setLeadValue(val) {
+  const leadField = getLeadField();
+  if (leadField) leadField.value = val || "";
+}
+
+function hydrateDiagnosisFromStorage() {
+  const stored = localStorage.getItem(DIAG_KEY) || "";
+  if (stored) {
+    lastDiagnosis = stored;
+    // opcional: precargar el hidden por si van directo al form
+    setLeadValue(stored);
+  }
+}
+
+function clearDiagnosisEverywhere() {
+  lastDiagnosis = "";
+  localStorage.removeItem(DIAG_KEY);
+  setLeadValue("");
 }
 
 function resetAll() {
   currentIndex = 0;
   answers = new Array(questions.length).fill(null);
 
-  // limpiar diagnóstico guardado
-  lastDiagnosis = "";
-  clearLeadField();
+  clearDiagnosisEverywhere();
 
   if (resultSection) resultSection.hidden = true;
   if (quizSection) quizSection.hidden = false;
@@ -186,13 +208,11 @@ function renderQuestion() {
     btn.textContent = opt.label;
 
     btn.addEventListener("click", () => {
-      // feedback seleccionado
       document.querySelectorAll(".option").forEach((el) => el.classList.remove("is-selected"));
       btn.classList.add("is-selected");
 
       answers[currentIndex] = idx;
 
-      // autopaso con mini delay
       setTimeout(() => {
         if (currentIndex < questions.length - 1) {
           currentIndex += 1;
@@ -226,9 +246,9 @@ function showResult() {
 
   // ✅ guardar diagnóstico para el form (Netlify)
   lastDiagnosis = `${r.title} — ${r.text}`;
+  localStorage.setItem(DIAG_KEY, lastDiagnosis);
 
-  const leadField = document.getElementById("leadResult");
-  if (leadField) leadField.value = lastDiagnosis;
+  setLeadValue(lastDiagnosis);
 
   // pintar resultado en pantalla
   if (resultTitleEl) resultTitleEl.textContent = r.title;
@@ -275,14 +295,26 @@ if (btnRestart) {
   });
 }
 
+// ✅ refuerzo: cuando clickean "hablemos" desde el resultado, aseguramos el hidden
+if (resultTalkLink) {
+  resultTalkLink.addEventListener("click", () => {
+    const stored = localStorage.getItem(DIAG_KEY) || "";
+    if (stored) {
+      lastDiagnosis = stored;
+      setLeadValue(stored);
+    }
+  });
+}
+
 // ✅ Form submit: asegurar resultado + UX "gracias"
 if (contactForm && submitBtn) {
   contactForm.addEventListener("submit", () => {
-    const leadField = document.getElementById("leadResult");
+    const leadField = getLeadField();
+    const stored = localStorage.getItem(DIAG_KEY) || "";
 
-    // si no hay diagnóstico guardado, igual mandamos algo
+    // si no hay value, usar lo guardado; si no hay nada, fallback
     if (leadField && !leadField.value) {
-      leadField.value = lastDiagnosis || "contacto sin lectura de marca";
+      leadField.value = stored || lastDiagnosis || "contacto sin lectura de marca";
     }
 
     submitBtn.textContent = "gracias";
@@ -295,9 +327,7 @@ if (contactForm && submitBtn) {
 // Init
 // ==============================
 document.addEventListener("DOMContentLoaded", () => {
-  // primera render
+  hydrateDiagnosisFromStorage();
   renderQuestion();
-
-  // si el botón back existe, en la primera pantalla no se ve
   if (btnBack) btnBack.style.visibility = "hidden";
 });
